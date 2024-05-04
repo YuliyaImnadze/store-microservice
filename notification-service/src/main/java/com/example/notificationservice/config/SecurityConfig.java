@@ -25,7 +25,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withJwkSetUri("http://localhost:9080/auth/realms/micro-store/protocol/openid-connect/certs").build();
+        return NimbusJwtDecoder.withJwkSetUri("http://localhost:9080/realms/micro-store/protocol/openid-connect/certs").build();
     }
 
 }

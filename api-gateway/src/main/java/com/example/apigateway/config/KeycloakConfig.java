@@ -1,7 +1,10 @@
 package com.example.apigateway.config;
 
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -20,7 +23,7 @@ public class KeycloakConfig {
                                                          ReactiveClientRegistrationRepository clientRegistrationRepository,
                                                          ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
+                .authorizeExchange(exchanges -> exchanges.pathMatchers("/login").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2Login(Customizer.withDefaults())
@@ -32,6 +35,24 @@ public class KeycloakConfig {
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         return NimbusReactiveJwtDecoder.withJwkSetUri("http://localhost:9080/realms/micro-store/protocol/openid-connect/certs")
+                .build();
+    }
+
+    @Bean
+    public RouteLocator myRoutes(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route(p -> p
+                        .path("/login")
+                        .and()
+                        .method(HttpMethod.POST)
+                        .filters(f -> f
+                                .addRequestParameter("client_id", "springsecurity")
+                                .addRequestParameter("client_secret", "XigGpqqEtBw9Jx5KNWAFk7MRBkJp9TgB")
+                                .addRequestParameter("username", "test")
+                                .addRequestParameter("password", "test")
+                                .addRequestParameter("grant_type", "password"))
+                        .uri("http://localhost:9080/realms/micro-store/protocol/openid-connect/token"))
+
                 .build();
     }
 }
