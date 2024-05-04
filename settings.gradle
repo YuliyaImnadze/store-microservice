@@ -1,0 +1,6 @@
+rootProject.name = 'store-microservice'
+
+includeBuild('eureka-server')
+includeBuild('api-gateway')
+includeBuild('balance-service')
+includeBuild('notification-service')
